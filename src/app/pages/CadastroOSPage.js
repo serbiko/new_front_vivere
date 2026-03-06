@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { FileText, ClipboardList, PartyPopper, Wrench, MessageSquare, Save, CheckCircle, Truck, CalendarDays, Star, Building, User, Phone, MapPin, Clock, Calendar, CalendarClock, Plus, Trash2, Package } from 'lucide-react';
 import { estruturas } from '../data/estruturas';
 
-export default function CadastroOSPage() {
+export default function CadastroOSPage({ darkMode }) {
   const [formData, setFormData] = useState({
     numeroOS: '', tipoEvento: 'grande-evento', fornecedor: '', dataOS: '',
     nomeEvento: '', solicitante: '', dataEvento: '', responsavelEvento: '',
@@ -56,16 +56,24 @@ export default function CadastroOSPage() {
     { value: 'projeto', label: 'Projeto' },
   ];
 
+  const inputClass = `w-full px-4 py-3 border rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-colors duration-300
+    ${darkMode ? 'bg-zinc-900 border-zinc-800 text-white placeholder-zinc-600' : 'bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400'}`;
+
   const InputField = ({ label, name, type = 'text', placeholder, icon: Icon, required = false, colSpan = 1 }) => (
     <div className={colSpan === 2 ? 'md:col-span-2' : ''}>
-      <label className="block text-sm font-medium text-zinc-400 mb-2">{label} {required && <span className="text-orange-500">*</span>}</label>
+      <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+        {label} {required && <span className="text-orange-500">*</span>}
+      </label>
       <div className="relative">
-        {Icon && <Icon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />}
+        {Icon && <Icon className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`} />}
         <input type={type} name={name} value={formData[name]} onChange={handleChange} placeholder={placeholder} required={required}
-          className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20`} />
+          className={`${inputClass} ${Icon ? 'pl-12' : ''}`} />
       </div>
     </div>
   );
+
+  const sectionClass = `rounded-2xl border p-6 transition-colors duration-300
+    ${darkMode ? 'bg-gradient-to-br from-zinc-900 to-zinc-950 border-zinc-800' : 'bg-white border-zinc-200 shadow-sm'}`;
 
   return (
     <div className="space-y-6">
@@ -75,26 +83,47 @@ export default function CadastroOSPage() {
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/30">
             <FileText className="w-6 h-6 text-black" />
           </div>
-          <div><h2 className="text-2xl font-bold text-white">Nova Ordem de Serviço</h2><p className="text-zinc-500 text-sm">Preencha os dados do evento e montagem</p></div>
+          <div>
+            <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-zinc-900'}`}>Nova Ordem de Serviço</h2>
+            <p className={darkMode ? 'text-zinc-500' : 'text-zinc-500'}>Preencha os dados do evento e montagem</p>
+          </div>
         </div>
-        {saved && <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-xl"><CheckCircle className="w-5 h-5 text-green-500" /><span className="text-green-400 font-medium">OS salva com sucesso!</span></div>}
+        {saved && (
+          <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-xl">
+            <CheckCircle className="w-5 h-5 text-green-500" /><span className="text-green-500 font-medium">OS salva com sucesso!</span>
+          </div>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Identificação */}
-        <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-2xl border border-zinc-800 p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2"><ClipboardList className="w-5 h-5 text-orange-500" />Identificação da OS</h3>
+        <div className={sectionClass}>
+          <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+            <ClipboardList className="w-5 h-5 text-orange-500" />Identificação da OS
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div><label className="block text-sm font-medium text-zinc-400 mb-2">Nº da OS <span className="text-orange-500">*</span></label><input type="text" name="numeroOS" value={formData.numeroOS} onChange={handleChange} placeholder="001" required className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500/50" /></div>
-            <div><label className="block text-sm font-medium text-zinc-400 mb-2">Tipo de Evento <span className="text-orange-500">*</span></label><select name="tipoEvento" value={formData.tipoEvento} onChange={handleChange} className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none focus:border-orange-500/50">{tiposEvento.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}</select></div>
+            <div>
+              <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>Nº da OS <span className="text-orange-500">*</span></label>
+              <input type="text" name="numeroOS" value={formData.numeroOS} onChange={handleChange} placeholder="001" required className={inputClass} />
+            </div>
+            <div>
+              <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>Tipo de Evento <span className="text-orange-500">*</span></label>
+              <select name="tipoEvento" value={formData.tipoEvento} onChange={handleChange} className={inputClass}>
+                {tiposEvento.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+              </select>
+            </div>
             <InputField label="Data da OS" name="dataOS" type="date" icon={CalendarDays} required />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"><InputField label="Fornecedor" name="fornecedor" placeholder="Nome do fornecedor" icon={Truck} /></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <InputField label="Fornecedor" name="fornecedor" placeholder="Nome do fornecedor" icon={Truck} />
+          </div>
         </div>
 
         {/* Dados do Evento */}
-        <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-2xl border border-zinc-800 p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2"><PartyPopper className="w-5 h-5 text-orange-500" />Dados do Evento</h3>
+        <div className={sectionClass}>
+          <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+            <PartyPopper className="w-5 h-5 text-orange-500" />Dados do Evento
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InputField label="Nome do Evento" name="nomeEvento" placeholder="Ex: Festival de Inverno 2024" icon={Star} required colSpan={2} />
             <InputField label="Solicitante (Secretaria/Prefeitura)" name="solicitante" placeholder="Ex: Secretaria de Cultura" icon={Building} required />
@@ -107,8 +136,10 @@ export default function CadastroOSPage() {
         </div>
 
         {/* Montagem/Desmontagem */}
-        <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-2xl border border-zinc-800 p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2"><Wrench className="w-5 h-5 text-orange-500" />Informações de Montagem e Desmontagem</h3>
+        <div className={sectionClass}>
+          <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+            <Wrench className="w-5 h-5 text-orange-500" />Informações de Montagem e Desmontagem
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InputField label="Data/Hora Início Montagem" name="dataHoraInicioMontagem" type="datetime-local" icon={CalendarClock} required />
             <InputField label="Responsável da OS" name="responsavelOS" placeholder="Nome do responsável técnico" icon={User} required />
@@ -118,16 +149,17 @@ export default function CadastroOSPage() {
           </div>
         </div>
 
-        {/* Estruturas do Evento */}
-        <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-2xl border border-zinc-800 p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2"><Package className="w-5 h-5 text-orange-500" />Estruturas do Evento</h3>
+        {/* Estruturas */}
+        <div className={sectionClass}>
+          <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+            <Package className="w-5 h-5 text-orange-500" />Estruturas do Evento
+          </h3>
           
-          {/* Seletor */}
           <div className="flex flex-col sm:flex-row gap-3 mb-6">
-            <select value={tipoEstrutura} onChange={(e) => setTipoEstrutura(e.target.value)} className="flex-1 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-orange-500/50">
+            <select value={tipoEstrutura} onChange={(e) => setTipoEstrutura(e.target.value)} className={`flex-1 ${inputClass}`}>
               {Object.entries(estruturas).map(([key, val]) => <option key={key} value={key}>{val.icon} {val.nome}</option>)}
             </select>
-            <select value={subtipoEstrutura} onChange={(e) => setSubtipoEstrutura(e.target.value)} className="flex-1 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-orange-500/50">
+            <select value={subtipoEstrutura} onChange={(e) => setSubtipoEstrutura(e.target.value)} className={`flex-1 ${inputClass}`}>
               {estruturas[tipoEstrutura]?.tipos.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
             </select>
             <button type="button" onClick={adicionarEstrutura} className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-black font-bold rounded-xl flex items-center gap-2 transition-all">
@@ -135,36 +167,35 @@ export default function CadastroOSPage() {
             </button>
           </div>
 
-          {/* Lista de Estruturas */}
           {estruturasSelecionadas.length === 0 ? (
-            <div className="p-8 border-2 border-dashed border-zinc-800 rounded-xl text-center">
-              <Package className="w-12 h-12 text-zinc-700 mx-auto mb-3" />
-              <p className="text-zinc-500">Nenhuma estrutura adicionada</p>
-              <p className="text-zinc-600 text-sm">Selecione o tipo e clique em adicionar</p>
+            <div className={`p-8 border-2 border-dashed rounded-xl text-center ${darkMode ? 'border-zinc-800' : 'border-zinc-300'}`}>
+              <Package className={`w-12 h-12 mx-auto mb-3 ${darkMode ? 'text-zinc-700' : 'text-zinc-400'}`} />
+              <p className={darkMode ? 'text-zinc-500' : 'text-zinc-500'}>Nenhuma estrutura adicionada</p>
+              <p className={`text-sm ${darkMode ? 'text-zinc-600' : 'text-zinc-400'}`}>Selecione o tipo e clique em adicionar</p>
             </div>
           ) : (
             <div className="space-y-4">
               {estruturasSelecionadas.map((est) => (
-                <div key={est.id} className="bg-zinc-800/50 rounded-xl border border-zinc-700 overflow-hidden">
-                  <div className="p-4 border-b border-zinc-700 flex items-center justify-between">
+                <div key={est.id} className={`rounded-xl border overflow-hidden ${darkMode ? 'bg-zinc-800/50 border-zinc-700' : 'bg-zinc-50 border-zinc-200'}`}>
+                  <div className={`p-4 border-b flex items-center justify-between ${darkMode ? 'border-zinc-700' : 'border-zinc-200'}`}>
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">{est.icon}</span>
                       <div>
-                        <h4 className="text-white font-semibold">{est.nome}</h4>
-                        <p className="text-zinc-500 text-sm">{est.descricao}</p>
+                        <h4 className={`font-semibold ${darkMode ? 'text-white' : 'text-zinc-900'}`}>{est.nome}</h4>
+                        <p className={`text-sm ${darkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>{est.descricao}</p>
                       </div>
                     </div>
-                    <button type="button" onClick={() => removerEstrutura(est.id)} className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors">
+                    <button type="button" onClick={() => removerEstrutura(est.id)} className={`p-2 rounded-lg transition-colors ${darkMode ? 'text-zinc-500 hover:text-red-400 hover:bg-red-400/10' : 'text-zinc-400 hover:text-red-500 hover:bg-red-50'}`}>
                       <Trash2 className="w-5 h-5" />
                     </button>
                   </div>
-                  <div className="p-4 bg-zinc-900/50">
+                  <div className={`p-4 ${darkMode ? 'bg-zinc-900/50' : 'bg-white'}`}>
                     <p className="text-orange-500 text-xs font-medium mb-3 uppercase tracking-wide">Materiais Requisitados</p>
                     <ul className="space-y-2">
                       {est.materiais.map((mat, idx) => (
                         <li key={idx} className="flex items-start gap-2 text-sm">
                           <span className="text-orange-500 mt-0.5">•</span>
-                          <span className="text-zinc-300"><span className="text-white font-medium">{mat.qtd} x</span> {mat.nome}</span>
+                          <span className={darkMode ? 'text-zinc-300' : 'text-zinc-600'}><span className={`font-medium ${darkMode ? 'text-white' : 'text-zinc-900'}`}>{mat.qtd} x</span> {mat.nome}</span>
                         </li>
                       ))}
                     </ul>
@@ -172,25 +203,26 @@ export default function CadastroOSPage() {
                 </div>
               ))}
               
-              {/* Resumo Total */}
               <div className="mt-4 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
-                <p className="text-orange-400 font-medium mb-2">📦 Resumo Total de Materiais</p>
-                <p className="text-zinc-400 text-sm">{estruturasSelecionadas.length} estrutura(s) selecionada(s) • {estruturasSelecionadas.reduce((acc, e) => acc + e.materiais.reduce((a, m) => a + m.qtd, 0), 0)} itens no total</p>
+                <p className="text-orange-500 font-medium mb-2">📦 Resumo Total de Materiais</p>
+                <p className={darkMode ? 'text-zinc-400' : 'text-zinc-600'}>{estruturasSelecionadas.length} estrutura(s) • {estruturasSelecionadas.reduce((acc, e) => acc + e.materiais.reduce((a, m) => a + m.qtd, 0), 0)} itens</p>
               </div>
             </div>
           )}
         </div>
 
         {/* Observações */}
-        <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-2xl border border-zinc-800 p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2"><MessageSquare className="w-5 h-5 text-orange-500" />Observações</h3>
-          <textarea name="observacoes" value={formData.observacoes} onChange={handleChange} placeholder="Informações adicionais sobre a montagem, materiais necessários, requisitos especiais..." rows={4}
-            className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500/50 resize-none" />
+        <div className={sectionClass}>
+          <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
+            <MessageSquare className="w-5 h-5 text-orange-500" />Observações
+          </h3>
+          <textarea name="observacoes" value={formData.observacoes} onChange={handleChange} placeholder="Informações adicionais..." rows={4}
+            className={`${inputClass} resize-none`} />
         </div>
 
         {/* Botões */}
         <div className="flex justify-end gap-4">
-          <button type="button" className="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-medium rounded-xl transition-all">Cancelar</button>
+          <button type="button" className={`px-6 py-3 font-medium rounded-xl transition-all ${darkMode ? 'bg-zinc-800 hover:bg-zinc-700 text-white' : 'bg-zinc-200 hover:bg-zinc-300 text-zinc-900'}`}>Cancelar</button>
           <button type="submit" disabled={isSaving} className="px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-black font-bold rounded-xl shadow-lg shadow-orange-500/30 flex items-center gap-2 disabled:opacity-70">
             {isSaving ? <><div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />Salvando...</> : <><Save className="w-5 h-5" />Salvar OS</>}
           </button>

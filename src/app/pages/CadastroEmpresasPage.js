@@ -6,7 +6,7 @@ import {
   MapPin, Save, CheckCircle 
 } from 'lucide-react';
 
-export default function CadastroEmpresasPage() {
+export default function CadastroEmpresasPage({ darkMode }) {
   const [formData, setFormData] = useState({
     nomeEmpresa: '',
     cnpj: '',
@@ -26,29 +26,23 @@ export default function CadastroEmpresasPage() {
     e.preventDefault();
     setIsSaving(true);
     
-    // Simulação do tempo de requisição para salvar no banco
     setTimeout(() => { 
       setIsSaving(false); 
       setSaved(true); 
-      
-      // Limpa o formulário após salvar
       setFormData({
         nomeEmpresa: '', cnpj: '', telefone: '', email: '', endereco: ''
       });
-
-      // Oculta a mensagem de sucesso após 3 segundos
       setTimeout(() => setSaved(false), 3000); 
     }, 1500);
   };
 
-  // Componente InputField idêntico ao do CadastroOSPage
   const InputField = ({ label, name, type = 'text', placeholder, icon: Icon, required = false, colSpan = 1 }) => (
     <div className={colSpan === 2 ? 'md:col-span-2' : ''}>
-      <label className="block text-sm font-medium text-zinc-400 mb-2">
+      <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${darkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
         {label} {required && <span className="text-orange-500">*</span>}
       </label>
       <div className="relative">
-        {Icon && <Icon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />}
+        {Icon && <Icon className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors duration-300 ${darkMode ? 'text-zinc-500' : 'text-zinc-400'}`} />}
         <input 
           type={type} 
           name={name} 
@@ -56,7 +50,10 @@ export default function CadastroEmpresasPage() {
           onChange={handleChange} 
           placeholder={placeholder} 
           required={required}
-          className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20`} 
+          className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-3 border rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-colors duration-300
+            ${darkMode 
+              ? 'bg-zinc-900 border-zinc-800 text-white placeholder-zinc-600' 
+              : 'bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400'}`} 
         />
       </div>
     </div>
@@ -71,14 +68,13 @@ export default function CadastroEmpresasPage() {
             <Building2 className="w-6 h-6 text-black" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white">Cadastro de Empresa</h2>
-            <p className="text-zinc-500 text-sm">Cadastre fornecedores, clientes ou empresas parceiras para seus eventos</p>
+            <h2 className={`text-2xl font-bold transition-colors duration-300 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>Cadastro de Empresa</h2>
+            <p className={`text-sm transition-colors duration-300 ${darkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>Cadastre fornecedores, clientes ou empresas parceiras para seus eventos</p>
           </div>
         </div>
         
-        {/* Notificação de Sucesso */}
         {saved && (
-          <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-xl animate-in fade-in slide-in-from-top-4">
+          <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-xl">
             <CheckCircle className="w-5 h-5 text-green-500" />
             <span className="text-green-400 font-medium">Empresa salva com sucesso!</span>
           </div>
@@ -88,8 +84,11 @@ export default function CadastroEmpresasPage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         
         {/* Dados da Empresa */}
-        <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-2xl border border-zinc-800 p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <div className={`rounded-2xl border p-6 transition-colors duration-300
+          ${darkMode 
+            ? 'bg-gradient-to-br from-zinc-900 to-zinc-950 border-zinc-800' 
+            : 'bg-white border-zinc-200 shadow-sm'}`}>
+          <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-zinc-900'}`}>
             <Building className="w-5 h-5 text-orange-500" />
             Informações Cadastrais
           </h3>
@@ -141,7 +140,10 @@ export default function CadastroEmpresasPage() {
         <div className="flex justify-end gap-4">
           <button 
             type="button" 
-            className="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-medium rounded-xl transition-all"
+            className={`px-6 py-3 font-medium rounded-xl transition-all duration-300
+              ${darkMode 
+                ? 'bg-zinc-800 hover:bg-zinc-700 text-white' 
+                : 'bg-zinc-200 hover:bg-zinc-300 text-zinc-900'}`}
           >
             Cancelar
           </button>

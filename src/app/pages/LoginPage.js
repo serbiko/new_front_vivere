@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, AlertTriangle, ArrowRight, ClipboardList, Users, Package, Truck, Construction } from 'lucide-react';
 import VivereIcon from '../components/VivereIcon';
 
-export default function LoginPage({ onLogin }) {
+export default function LoginPage({ onLogin, darkMode = true }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -93,7 +93,7 @@ export default function LoginPage({ onLogin }) {
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu.nome@vivere.com.br"
-                  className="w-full pl-12 pr-4 py-3.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200" />
+                  className="w-full pl-12 pr-4 py-3.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20" />
               </div>
             </div>
 
@@ -102,8 +102,8 @@ export default function LoginPage({ onLogin }) {
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
                 <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••"
-                  className="w-full pl-12 pr-12 py-3.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all duration-200" />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors">
+                  className="w-full pl-12 pr-12 py-3.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20" />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300">
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
@@ -111,22 +111,21 @@ export default function LoginPage({ onLogin }) {
 
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-orange-500 focus:ring-orange-500/20" />
+                <input type="checkbox" className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-orange-500" />
                 <span className="text-sm text-zinc-400">Manter conectado</span>
               </label>
-              <button type="button" className="text-sm text-orange-500 hover:text-orange-400 transition-colors">Esqueci a senha</button>
+              <button type="button" className="text-sm text-orange-500 hover:text-orange-400">Esqueci a senha</button>
             </div>
 
             {error && (
               <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3">
-                <AlertTriangle className="w-5 h-5 text-red-500" />
-                <span className="text-red-400 text-sm">{error}</span>
+                <AlertTriangle className="w-5 h-5 text-red-500" /><span className="text-red-400 text-sm">{error}</span>
               </div>
             )}
 
             <button type="submit" disabled={isLoading}
-              className="w-full py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-black font-bold rounded-xl shadow-lg shadow-orange-500/30 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
-              {isLoading ? (<><div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />Entrando...</>) : (<>Entrar no Sistema<ArrowRight className="w-5 h-5" /></>)}
+              className="w-full py-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-black font-bold rounded-xl shadow-lg shadow-orange-500/30 flex items-center justify-center gap-2 disabled:opacity-70">
+              {isLoading ? <><div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />Entrando...</> : <>Entrar no Sistema<ArrowRight className="w-5 h-5" /></>}
             </button>
           </form>
 
