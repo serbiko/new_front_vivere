@@ -6,6 +6,8 @@ import { Home as HomeIcon, Users, Building2, ClipboardList, LayoutDashboard, Pac
 import Sidebar from './components/Sidebar';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
+import CadastroPessoasPage from './pages/CadastroPessoasPage';
+import CadastroEmpresasPage from './pages/CadastroEmpresasPage';
 import CadastroOSPage from './pages/CadastroOSPage';
 import PainelPage from './pages/PainelPage';
 import EstoquePage from './pages/EstoquePage';
@@ -42,6 +44,8 @@ export default function App() {
   const renderContent = () => {
     switch (activeTab) {
       case 'home': return <HomePage setActiveTab={setActiveTab} setCadastroOpen={setCadastroOpen} />;
+      case 'cadastro-pessoas': return <CadastroPessoasPage />;
+      case 'cadastro-empresas': return <CadastroEmpresasPage />;
       case 'cadastro-os': return <CadastroOSPage />;
       case 'painel': return <PainelPage />;
       case 'estoque': return <EstoquePage />;
