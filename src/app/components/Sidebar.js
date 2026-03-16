@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { 
   Home as HomeIcon, UserPlus, LayoutDashboard, Package, Calendar, 
   Clock, HelpCircle, ChevronDown, ChevronRight, Users, Building2, 
-  X, ClipboardList
+  X, ClipboardList, Boxes, Wrench
 } from 'lucide-react';
 import VivereIcon from './VivereIcon';
 
@@ -16,43 +16,54 @@ export const menuItems = [
     icon: UserPlus,
     hasDropdown: true,
     subItems: [
-      { id: 'cadastro-pessoas', label: 'Cadastro de Pessoas', icon: Users },
-      { id: 'cadastro-empresas', label: 'Cadastro de Empresas', icon: Building2 },
-      { id: 'cadastro-os', label: 'Cadastro de OS', icon: ClipboardList },
+      { id: 'cadastro-pessoas', label: 'Pessoas', icon: Users },
+      { id: 'cadastro-empresas', label: 'Empresas', icon: Building2 },
     ]
   },
+  { id: 'ordem-servico', label: 'Ordem de Serviço', icon: ClipboardList },
   { id: 'painel', label: 'Painel', icon: LayoutDashboard },
-  { id: 'estoque', label: 'Estoque', icon: Package },
-  { id: 'evento', label: 'Evento', icon: Calendar },
+  { 
+    id: 'estoque', 
+    label: 'Estoque', 
+    icon: Package,
+    hasDropdown: true,
+    subItems: [
+      { id: 'estoque-materiais', label: 'Materiais', icon: Boxes },
+      { id: 'estoque-estruturas', label: 'Estruturas', icon: Wrench },
+    ]
+  },
+  { id: 'eventos', label: 'Eventos', icon: Calendar },
   { id: 'historico', label: 'Histórico', icon: Clock },
   { id: 'ajuda', label: 'Ajuda', icon: HelpCircle },
 ];
 
-// Logo flutuante com menu horizontal (quando sidebar colapsada)
+// Logo flutuante com menu horizontal (quando sidebar colapsada) - APENAS DESKTOP
 export function FloatingNav({ sidebarCollapsed, setSidebarCollapsed, activeTab, setActiveTab, darkMode }) {
-  const [localDropdownOpen, setLocalDropdownOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(null);
   const [logoHovered, setLogoHovered] = useState(false);
 
   const handleMenuClick = (item) => {
     if (item.hasDropdown) {
-      setLocalDropdownOpen(!localDropdownOpen);
+      setOpenDropdown(openDropdown === item.id ? null : item.id);
     } else {
       setActiveTab(item.id);
-      setLocalDropdownOpen(false);
+      setOpenDropdown(null);
     }
   };
 
   const handleSubItemClick = (subId) => {
     setActiveTab(subId);
-    setLocalDropdownOpen(false);
+    setOpenDropdown(null);
   };
 
+  // Só renderiza em desktop (lg+)
+  if (!sidebarCollapsed) return null;
+
   return (
-    <>
-      {/* Logo flutuante - sempre visível, mas muda de posição/opacidade */}
+    <div className="hidden lg:block">
+      {/* Logo flutuante */}
       <div 
-        className={`fixed top-4 left-4 z-50 transition-all duration-500 ease-out
-          ${sidebarCollapsed ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8 pointer-events-none'}`}
+        className="fixed top-4 left-4 z-50"
         onMouseEnter={() => setLogoHovered(true)}
         onMouseLeave={() => setLogoHovered(false)}
       >
@@ -78,14 +89,14 @@ export function FloatingNav({ sidebarCollapsed, setSidebarCollapsed, activeTab, 
       </div>
 
       {/* Menu horizontal centralizado */}
-      <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-40 transition-all duration-500 ease-out
-        ${sidebarCollapsed ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8 pointer-events-none'}`}>
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-40">
         <div className={`backdrop-blur-xl border rounded-2xl shadow-2xl px-2 py-1.5 transition-all duration-300
           ${darkMode ? 'bg-zinc-900/95 border-zinc-800 shadow-black/50' : 'bg-white/95 border-zinc-200 shadow-black/10'}`}>
           <div className="flex items-center gap-1">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id || (item.subItems?.some(sub => sub.id === activeTab));
+              const isDropdownOpen = openDropdown === item.id;
               
               return (
                 <div key={item.id} className="relative">
@@ -99,10 +110,10 @@ export function FloatingNav({ sidebarCollapsed, setSidebarCollapsed, activeTab, 
                   >
                     <Icon className={`w-4 h-4 ${isActive ? 'text-black' : ''}`} />
                     <span className="font-medium text-sm">{item.label}</span>
-                    {item.hasDropdown && <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${localDropdownOpen ? 'rotate-180' : ''}`} />}
+                    {item.hasDropdown && <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />}
                   </button>
                   
-                  {item.hasDropdown && localDropdownOpen && (
+                  {item.hasDropdown && isDropdownOpen && (
                     <div className={`absolute top-full left-0 mt-2 border rounded-xl shadow-xl p-2 min-w-48 z-50 transition-all duration-200
                       ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}>
                       {item.subItems.map((sub) => {
@@ -128,7 +139,7 @@ export function FloatingNav({ sidebarCollapsed, setSidebarCollapsed, activeTab, 
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -140,24 +151,36 @@ export default function Sidebar({
   setSidebarCollapsed,
   activeTab,
   setActiveTab,
-  cadastroOpen,
-  setCadastroOpen,
+  openDropdowns = {},
+  setOpenDropdowns,
   user,
   onLogout,
   darkMode
 }) {
+  // State local para dropdowns se não for passado via props
+  const [localOpenDropdowns, setLocalOpenDropdowns] = useState({});
+  const dropdowns = setOpenDropdowns ? openDropdowns : localOpenDropdowns;
+  const setDropdowns = setOpenDropdowns || setLocalOpenDropdowns;
+
+  const toggleDropdown = (dropdownId) => {
+    setDropdowns(prev => ({
+      ...prev,
+      [dropdownId]: !prev[dropdownId]
+    }));
+  };
+
   const handleMenuClick = (item) => {
     if (item.hasDropdown) {
-      setCadastroOpen(!cadastroOpen);
+      toggleDropdown(item.id);
     } else {
       setActiveTab(item.id);
-      setMobileMenuOpen(false);
+      if (isMobile) setMobileMenuOpen(false);
     }
   };
 
   const handleSubItemClick = (subItem) => {
     setActiveTab(subItem.id);
-    setMobileMenuOpen(false);
+    if (isMobile) setMobileMenuOpen(false);
   };
 
   // Desktop: sidebar com transição suave de largura e opacidade
@@ -200,6 +223,7 @@ export default function Sidebar({
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id || (item.subItems?.some(sub => sub.id === activeTab));
+              const isDropdownOpen = dropdowns[item.id];
               
               return (
                 <div key={item.id}>
@@ -213,11 +237,11 @@ export default function Sidebar({
                     {!isActive && <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-orange-500/10 to-orange-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />}
                     <Icon className={`w-5 h-5 flex-shrink-0 relative z-10 ${isActive ? 'text-black' : ''}`} />
                     <span className="font-semibold text-sm relative z-10 flex-1 text-left">{item.label}</span>
-                    {item.hasDropdown && <ChevronDown className={`w-4 h-4 relative z-10 transition-transform duration-300 ${cadastroOpen ? 'rotate-180' : ''}`} />}
+                    {item.hasDropdown && <ChevronDown className={`w-4 h-4 relative z-10 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />}
                   </button>
 
                   {item.hasDropdown && (
-                    <div className={`overflow-hidden transition-all duration-300 ease-out ${cadastroOpen ? 'max-h-48 opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
+                    <div className={`overflow-hidden transition-all duration-300 ease-out ${isDropdownOpen ? 'max-h-48 opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
                       <div className="ml-4 pl-4 border-l-2 border-orange-500/30 space-y-1">
                         {item.subItems.map((subItem) => {
                           const SubIcon = subItem.icon;
@@ -312,6 +336,7 @@ export default function Sidebar({
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id || (item.subItems?.some(sub => sub.id === activeTab));
+            const isDropdownOpen = dropdowns[item.id];
             
             return (
               <div key={item.id}>
@@ -325,11 +350,11 @@ export default function Sidebar({
                   {!isActive && <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-orange-500/10 to-orange-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />}
                   <Icon className={`w-5 h-5 flex-shrink-0 relative z-10 ${isActive ? 'text-black' : ''}`} />
                   <span className="font-semibold text-sm relative z-10 flex-1 text-left">{item.label}</span>
-                  {item.hasDropdown && <ChevronDown className={`w-4 h-4 relative z-10 transition-transform duration-300 ${cadastroOpen ? 'rotate-180' : ''}`} />}
+                  {item.hasDropdown && <ChevronDown className={`w-4 h-4 relative z-10 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />}
                 </button>
 
                 {item.hasDropdown && (
-                  <div className={`overflow-hidden transition-all duration-300 ease-out ${cadastroOpen ? 'max-h-48 opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
+                  <div className={`overflow-hidden transition-all duration-300 ease-out ${isDropdownOpen ? 'max-h-48 opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
                     <div className="ml-4 pl-4 border-l-2 border-orange-500/30 space-y-1">
                       {item.subItems.map((subItem) => {
                         const SubIcon = subItem.icon;
